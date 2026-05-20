@@ -1,17 +1,19 @@
 {
-  "name": "server",
+  "name": "recall-server",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "Backend for Recall project",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
   }
 }
