@@ -54,15 +54,13 @@ Created scalable backend folders:
 ### Health Check API
 Created first API endpoint:
 
-```text
+
 GET /health
 
 
----
 
-# ✅ Day 4 README Addition
 
-```md
+
 ## ✅ Day 4 Progress
 
 ### User Authentication APIs
@@ -78,6 +76,25 @@ Connected:
 
 ### Current APIs
 
-```text
 POST /api/users/register
 POST /api/users/login
+
+
+## ✅ Day 5 Progress
+
+### User Model Layer
+- Created an in-memory user model
+- Added helper functions to create users and find users by email
+- Separated data logic from controller logic
+
+### Authentication Validation
+- Added duplicate email check during registration
+- Added login validation using email and password
+- Returned proper success and error responses
+
+### APIs Tested
+- Register User
+- Login User
+- Duplicate registration case
+
+
