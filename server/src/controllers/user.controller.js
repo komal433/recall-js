@@ -1,3 +1,4 @@
+const generateToken = require("../utils/token");
 const { findUserByEmail, createUser } = require("../models/user.model");
 
 const registerUser = (req, res) => {
@@ -57,6 +58,19 @@ const loginUser = (req, res) => {
       message: "Invalid email or password",
     });
   }
+   const token = generateToken(user);
+
+  return res.status(200).json({
+    success: true,
+    message: "User logged in successfully",
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    },
+  });
+
 
   return res.status(200).json({
     success: true,

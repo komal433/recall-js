@@ -97,4 +97,14 @@ POST /api/users/login
 - Login User
 - Duplicate registration case
 
+## ✅ Day 6 Progress
 
+### JWT Authentication
+- Installed jsonwebtoken package
+- Created token generation utility
+- Added JWT token in login response
+
+### Learning Focus
+- Understanding stateless authentication
+- Understanding JWT payload
+- Understanding token-based login flow
