@@ -72,18 +72,18 @@ const loginUser = (req, res) => {
   });
 
 
+
+  
+};
+const getProfile = (req, res) => {
   return res.status(200).json({
     success: true,
-    message: "User logged in successfully",
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    },
+    message: "Protected profile data",
+    user: req.user,
   });
 };
-
 module.exports = {
   registerUser,
   loginUser,
+  getProfile,
 };
