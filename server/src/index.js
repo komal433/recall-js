@@ -1,4 +1,5 @@
 const express = require("express");
+const connectDB = require("./config/db");
 const app = express();
 
 // Middleware to parse JSON
@@ -20,6 +21,7 @@ app.use("/api/users", userRoutes);
 
 // Server start
 const PORT = 5000;
+connectDB();
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
