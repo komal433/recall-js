@@ -1,17 +1,17 @@
 const generateToken = require("../utils/token");
 const { findUserByEmail, createUser } = require("../models/user.model");
 
-const registerUser = (req, res) => {
+const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({
       success: false,
-      message: "All fields are required",
+      message: "Name, email and password are required",
     });
   }
 
-  const existingUser = findUserByEmail(email);
+  const existingUser = await findUserByEmail(email);
 
   if (existingUser) {
     return res.status(409).json({
@@ -20,27 +20,24 @@ const registerUser = (req, res) => {
     });
   }
 
-  const newUser = {
-    id: Date.now(),
+  const user = await createUser({
     name,
     email,
     password,
-  };
-
-  createUser(newUser);
+  });
 
   return res.status(201).json({
     success: true,
     message: "User registered successfully",
     user: {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
+      id: user._id,
+      name: user.name,
+      email: user.email,
     },
   });
 };
 
-const loginUser = (req, res) => {
+const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -50,7 +47,7 @@ const loginUser = (req, res) => {
     });
   }
 
-  const user = findUserByEmail(email);
+  const user = await findUserByEmail(email);
 
   if (!user || user.password !== password) {
     return res.status(401).json({
@@ -58,23 +55,24 @@ const loginUser = (req, res) => {
       message: "Invalid email or password",
     });
   }
-   const token = generateToken(user);
+
+  const token = generateToken({
+    id: user._id,
+    email: user.email,
+  });
 
   return res.status(200).json({
     success: true,
     message: "User logged in successfully",
     token,
     user: {
-      id: user.id,
+      id: user._id,
       name: user.name,
       email: user.email,
     },
   });
-
-
-
-  
 };
+
 const getProfile = (req, res) => {
   return res.status(200).json({
     success: true,
@@ -82,6 +80,7 @@ const getProfile = (req, res) => {
     user: req.user,
   });
 };
+
 module.exports = {
   registerUser,
   loginUser,

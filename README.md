@@ -104,7 +104,12 @@ POST /api/users/login
 - Created token generation utility
 - Added JWT token in login response
 
-### Learning Focus
-- Understanding stateless authentication
-- Understanding JWT payload
-- Understanding token-based login flow
+## ✅ Day 8 Progress
+
+### MongoDB Atlas Connection
+- Installed Mongoose
+- Created database configuration file
+- Connected backend server to MongoDB Atlas
+- Replaced local MongoDB setup with cloud database connection
+- Prepared project for persistent user storage
+
