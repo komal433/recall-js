@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/token");
 const { findUserByEmail, createUser } = require("../models/user.model");
 
@@ -20,10 +21,12 @@ const registerUser = async (req, res) => {
     });
   }
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   const user = await createUser({
     name,
     email,
-    password,
+    password: hashedPassword,
   });
 
   return res.status(201).json({
@@ -49,7 +52,16 @@ const loginUser = async (req, res) => {
 
   const user = await findUserByEmail(email);
 
-  if (!user || user.password !== password) {
+  if (!user) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid email or password",
+    });
+  }
+
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordCorrect) {
     return res.status(401).json({
       success: false,
       message: "Invalid email or password",

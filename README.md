@@ -113,3 +113,28 @@ POST /api/users/login
 - Replaced local MongoDB setup with cloud database connection
 - Prepared project for persistent user storage
 
+## ✅ Day 9 Progress
+
+### Mongoose User Model
+- Created a real User schema using Mongoose
+- Added fields for name, email, and password
+- Added timestamps for created and updated user records
+- Replaced temporary in-memory user storage with MongoDB storage
+
+### Database-Based Authentication Flow
+- Updated register controller to save users in MongoDB
+- Updated login controller to find users from MongoDB
+- Converted controller functions to async/await
+- Used MongoDB `_id` as the user identifier
+
+
+## ✅ Day 10 Progress
+
+### Password Hashing
+- Installed `bcryptjs`
+- Added password hashing during user registration
+- Stored hashed passwords instead of plain-text passwords
+- Added secure password comparison during login
+
+### Authentication Security Improvement
+Before Day 10, passwords were stored directly in the database.
