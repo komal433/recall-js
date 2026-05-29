@@ -138,3 +138,12 @@ POST /api/users/login
 
 ### Authentication Security Improvement
 Before Day 10, passwords were stored directly in the database.
+
+## ✅ Day 11 Progress
+
+### Environment Variables Setup
+- Installed `dotenv`
+- Created `.env` file for sensitive configuration
+- Moved MongoDB connection string from code to environment variables
+- Moved JWT secret and expiry time to environment variables
+- Added `.env` to `.gitignore` to prevent secrets from being pushed to GitHub
