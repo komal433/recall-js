@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/token");
+const asyncHandler = require("../utils/asyncHandler");
 const { findUserByEmail, createUser } = require("../models/user.model");
 
 const registerUser = async (req, res) => {

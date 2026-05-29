@@ -147,3 +147,16 @@ Before Day 10, passwords were stored directly in the database.
 - Moved MongoDB connection string from code to environment variables
 - Moved JWT secret and expiry time to environment variables
 - Added `.env` to `.gitignore` to prevent secrets from being pushed to GitHub
+
+## ✅ Day 12 Progress
+
+### Centralized Error Handling
+- Created global error middleware
+- Added clean JSON error responses
+- Improved backend error flow
+- Avoided repeated error response logic inside controllers
+
+### Async Handler Utility
+- Created reusable `asyncHandler` utility
+- Wrapped async controllers to catch errors automatically
+- Forwarded async errors to centralized error middleware

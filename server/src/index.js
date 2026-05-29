@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db");
+const errorMiddleware = require("./middleware/error.middleware");
 const app = express();
 
 // Middleware to parse JSON
@@ -19,7 +20,7 @@ app.get("/health", (req, res) => {
 
 // User APIs
 app.use("/api/users", userRoutes);
-
+app.use(errorMiddleware);
 // Server start
 const PORT = process.env.PORT || 5000;
 connectDB();
