@@ -160,3 +160,11 @@ Before Day 10, passwords were stored directly in the database.
 - Created reusable `asyncHandler` utility
 - Wrapped async controllers to catch errors automatically
 - Forwarded async errors to centralized error middleware
+
+## ✅ Day 13 Progress
+
+### Recall Feature Started
+- Created Recall model using Mongoose
+- Added schema fields for title, content, category, and user
+- Connected each recall to the logged-in user
+- Created protected APIs for creating and fetching recalls

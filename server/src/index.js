@@ -9,7 +9,7 @@ app.use(express.json());
 
 // Routes
 const userRoutes = require("./routes/user.routes");
-
+const recallRoutes = require("./routes/recall.routes");
 // Health check (optional but good practice)
 app.get("/health", (req, res) => {
   res.status(200).json({
@@ -20,6 +20,7 @@ app.get("/health", (req, res) => {
 
 // User APIs
 app.use("/api/users", userRoutes);
+app.use("/api/recalls", recallRoutes);
 app.use(errorMiddleware);
 // Server start
 const PORT = process.env.PORT || 5000;
