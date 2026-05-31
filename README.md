@@ -168,3 +168,11 @@ Before Day 10, passwords were stored directly in the database.
 - Added schema fields for title, content, category, and user
 - Connected each recall to the logged-in user
 - Created protected APIs for creating and fetching recalls
+
+## ✅ Day 14 Progress
+
+### Complete Recall CRUD
+- Added API to get a single recall by ID
+- Added API to update a recall
+- Added API to delete a recall
+- Completed full CRUD functionality for recall note

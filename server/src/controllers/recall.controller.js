@@ -35,7 +35,76 @@ const getRecalls = asyncHandler(async (req, res) => {
   });
 });
 
+const getRecallById = asyncHandler(async (req, res) => {
+  const recall = await Recall.findById(req.params.id);
+
+  if (!recall) {
+    res.status(404);
+    throw new Error("Recall not found");
+  }
+
+  if (recall.user.toString() !== req.user.id) {
+    res.status(403);
+    throw new Error("Not authorized to access this recall");
+  }
+
+  return res.status(200).json({
+    success: true,
+    recall,
+  });
+});
+
+const updateRecall = asyncHandler(async (req, res) => {
+  const recall = await Recall.findById(req.params.id);
+
+  if (!recall) {
+    res.status(404);
+    throw new Error("Recall not found");
+  }
+
+  if (recall.user.toString() !== req.user.id) {
+    res.status(403);
+    throw new Error("Not authorized to update this recall");
+  }
+
+  recall.title = req.body.title || recall.title;
+  recall.content = req.body.content || recall.content;
+  recall.category = req.body.category || recall.category;
+
+  const updatedRecall = await recall.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Recall updated successfully",
+    recall: updatedRecall,
+  });
+});
+
+const deleteRecall = asyncHandler(async (req, res) => {
+  const recall = await Recall.findById(req.params.id);
+
+  if (!recall) {
+    res.status(404);
+    throw new Error("Recall not found");
+  }
+
+  if (recall.user.toString() !== req.user.id) {
+    res.status(403);
+    throw new Error("Not authorized to delete this recall");
+  }
+
+  await recall.deleteOne();
+
+  return res.status(200).json({
+    success: true,
+    message: "Recall deleted successfully",
+  });
+});
+
 module.exports = {
   createRecall,
   getRecalls,
+  getRecallById,
+  updateRecall,
+  deleteRecall,
 };
