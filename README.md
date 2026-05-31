@@ -1,24 +1,120 @@
 # Recall – Backend Focused Project
 
-Recall is a full-stack application designed to store and retrieve user-specific information efficiently.
+Recall is a backend-focused full-stack project where users can securely store and revisit important concepts, interview notes, and learning points.
 
-## Project Goals
-- Strong backend architecture
-- Clean separation of concerns
-- Secure authentication
-- Scalable recall item management
+The project focuses on real-world backend development concepts such as authentication, protected routes, MongoDB database integration, password hashing, environment variables, centralized error handling, and user-specific CRUD operations.
+
 
 ## Tech Stack
 - JavaScript
 - Node.js
-- Express
-- Frontend: JavaScript (Client layer)
+- Express.js
+- MongoDB Atlas
+- Mongoose
+- JWT
+- bcryptjs
+- dotenv
+- Postman
 
-## Architecture
-- Client and Server separated
-- Layered backend structure (routes, controllers, services, models)
-- Centralized error handling (planned)
+## Features
 
+- User registration
+- User login
+- JWT-based authentication
+- Protected profile route
+- Password hashing using bcryptjs
+- MongoDB Atlas database connection
+- Mongoose-based user model
+- Environment variable based configuration
+- Centralized error handling
+- Async error handling utility
+- Create recall notes
+- View all recall notes of logged-in user
+- View a single recall note
+- Update recall note
+- Delete recall note
+- Ownership protection for recall notes
+- Clean backend folder structure
+- API testing using Postman
+
+## API Documentation
+
+### User APIs
+
+| Method | Endpoint | Description | Protected |
+|---|---|---|---|
+| POST | `/api/users/register` | Register a new user | No |
+| POST | `/api/users/login` | Login user and return JWT token | No |
+| GET | `/api/users/profile` | Get logged-in user profile data | Yes |
+
+### Recall APIs
+
+| Method | Endpoint | Description | Protected |
+|---|---|---|---|
+| POST | `/api/recalls` | Create a new recall note | Yes |
+| GET | `/api/recalls` | Get all recalls of logged-in user | Yes |
+| GET | `/api/recalls/:id` | Get a single recall by ID | Yes |
+| PUT | `/api/recalls/:id` | Update a recall by ID | Yes |
+| DELETE | `/api/recalls/:id` | Delete a recall by ID | Yes |
+
+## Setup Instructions
+
+### 1. Clone the repository
+
+```bash
+git clone <repository-url>
+cd recall-js
+```
+
+### 2. Install backend dependencies
+
+```bash
+cd server
+npm install
+```
+
+### 3. Create `.env` file
+
+Create a `.env` file inside the `server` folder.
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=1h
+```
+
+### 4. Start backend server
+
+```bash
+npm run dev
+```
+
+Server will run on:
+
+http://localhost:5000
+```
+## Learning Outcomes
+
+Through this project, I learned:
+
+- How to structure a backend project
+- How routes, controllers, models, middleware, utils, and config files work together
+- How to create REST APIs using Express.js
+- How to connect backend with MongoDB Atlas
+- How to create Mongoose schemas and models
+- How JWT authentication works
+- How protected routes are implemented
+- How password hashing works using bcryptjs
+- How to use environment variables securely
+- How centralized error handling works
+- How to build user-specific CRUD APIs
+- How ownership checks protect user data
+- How to test APIs using Postman
+- How to build and commit a project step by step using GitHub
+
+
+## Development Progress
 ## Progress Log
 - Day 1: Project setup, repository initialization, and backend architecture foundation
 
