@@ -272,3 +272,22 @@ Before Day 10, passwords were stored directly in the database.
 - Added API to update a recall
 - Added API to delete a recall
 - Completed full CRUD functionality for recall note
+
+## ✅ Day 16 Progress
+
+### Frontend Setup
+- Setup React frontend using Vite
+- Created frontend entry files using `index.html`, `main.jsx`, and `App.jsx`
+- Added custom CSS for a modern landing page and authentication UI
+- Connected frontend with backend APIs
+
+### Backend CORS Setup
+- Installed `cors`
+- Enabled CORS in Express backend
+- Allowed frontend running on `http://localhost:5173` to call backend APIs
+
+
+### Pages Added
+- Landing page
+- Register page
+- Login page
