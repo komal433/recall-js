@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -6,6 +6,9 @@ function App() {
   const [mode, setMode] = useState("landing");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [user, setUser] = useState(null);
+  const [recalls, setRecalls] = useState([]);
 
   const [registerData, setRegisterData] = useState({
     name: "",
@@ -17,6 +20,51 @@ function App() {
     email: "",
     password: "",
   });
+
+  const [recallData, setRecallData] = useState({
+    title: "",
+    content: "",
+    category: "General",
+  });
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+
+    if (storedUser && token) {
+      setUser(JSON.parse(storedUser));
+      setMode("dashboard");
+      fetchRecalls();
+    }
+  }, []);
+
+  const getToken = () => {
+    return localStorage.getItem("token");
+  };
+
+  const fetchRecalls = async () => {
+    try {
+      const token = getToken();
+
+      const res = await fetch(`${API_URL}/recalls`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.message || "Failed to fetch recalls");
+        return;
+      }
+
+      setRecalls(data.recalls || []);
+    } catch (error) {
+      setMessage("Unable to load recalls");
+    }
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -72,7 +120,10 @@ function App() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      setMessage("Login successful. Dashboard will be built on Day 17.");
+      setUser(data.user);
+      setMode("dashboard");
+      setMessage("Login successful");
+      fetchRecalls();
     } catch (error) {
       setMessage("Something went wrong. Please try again.");
     } finally {
@@ -80,17 +131,78 @@ function App() {
     }
   };
 
+  const handleCreateRecall = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const token = getToken();
+
+      const res = await fetch(`${API_URL}/recalls`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(recallData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.message || "Failed to create recall");
+        return;
+      }
+
+      setMessage("Recall created successfully");
+      setRecallData({
+        title: "",
+        content: "",
+        category: "General",
+      });
+
+      fetchRecalls();
+    } catch (error) {
+      setMessage("Something went wrong while creating recall");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    setRecalls([]);
+    setMode("landing");
+    setMessage("Logged out successfully");
+  };
+
   return (
     <div className="app">
       <nav className="navbar">
-        <div className="logo">Recall</div>
+        <div className="logo" onClick={() => setMode("landing")}>
+          Recall
+        </div>
 
         <div className="nav-actions">
-          <button onClick={() => setMode("landing")}>Home</button>
-          <button onClick={() => setMode("login")}>Login</button>
-          <button className="primary-btn" onClick={() => setMode("register")}>
-            Get Started
-          </button>
+          {user ? (
+            <>
+              <button onClick={() => setMode("dashboard")}>Dashboard</button>
+              <button className="secondary-btn" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => setMode("landing")}>Home</button>
+              <button onClick={() => setMode("login")}>Login</button>
+              <button className="primary-btn" onClick={() => setMode("register")}>
+                Get Started
+              </button>
+            </>
+          )}
         </div>
       </nav>
 
@@ -246,6 +358,96 @@ function App() {
             </p>
           </div>
         </section>
+      )}
+
+      {mode === "dashboard" && user && (
+        <main className="dashboard">
+          <section className="dashboard-header">
+            <div>
+              <p className="badge">Your personal recall space</p>
+              <h1>Welcome back, {user.name}</h1>
+              <p>
+                Create, organize, and revisit your most important learning notes.
+              </p>
+            </div>
+
+            <div className="dashboard-stat">
+              <h2>{recalls.length}</h2>
+              <p>Total Recalls</p>
+            </div>
+          </section>
+
+          <section className="dashboard-grid">
+            <div className="create-panel">
+              <h2>Create a new recall</h2>
+              <p>Save a concept, interview point, or backend learning.</p>
+
+              <form onSubmit={handleCreateRecall}>
+                <input
+                  type="text"
+                  placeholder="Title"
+                  value={recallData.title}
+                  onChange={(e) =>
+                    setRecallData({ ...recallData, title: e.target.value })
+                  }
+                />
+
+                <textarea
+                  placeholder="Write your recall note..."
+                  value={recallData.content}
+                  onChange={(e) =>
+                    setRecallData({ ...recallData, content: e.target.value })
+                  }
+                ></textarea>
+
+                <input
+                  type="text"
+                  placeholder="Category"
+                  value={recallData.category}
+                  onChange={(e) =>
+                    setRecallData({ ...recallData, category: e.target.value })
+                  }
+                />
+
+                <button className="primary-btn full" disabled={loading}>
+                  {loading ? "Saving..." : "Save Recall"}
+                </button>
+              </form>
+            </div>
+
+            <div className="recalls-panel">
+              <div className="panel-title">
+                <h2>Your recalls</h2>
+                <button className="secondary-btn" onClick={fetchRecalls}>
+                  Refresh
+                </button>
+              </div>
+
+              {recalls.length === 0 ? (
+                <div className="empty-state">
+                  <h3>No recalls yet</h3>
+                  <p>Create your first recall note from the form.</p>
+                </div>
+              ) : (
+                <div className="recall-list">
+                  {recalls.map((recall) => (
+                    <article className="recall-card" key={recall._id}>
+                      <div className="recall-top">
+                        <span>{recall.category || "General"}</span>
+                        <small>
+                          {new Date(recall.createdAt).toLocaleDateString()}
+                        </small>
+                      </div>
+
+                      <h3>{recall.title}</h3>
+                      <p>{recall.content}</p>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        </main>
       )}
 
       {message && <div className="toast">{message}</div>}

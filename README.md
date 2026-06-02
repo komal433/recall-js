@@ -291,3 +291,18 @@ Before Day 10, passwords were stored directly in the database.
 - Landing page
 - Register page
 - Login page
+
+
+## ✅ Day 17 Progress
+
+### Dashboard UI
+- Added dashboard page after user login
+- Displayed logged-in user information
+- Added total recall count on dashboard
+- Added logout functionality
+
+### Recall Creation from Frontend
+- Added create recall form on the website
+- Connected recall form with backend API
+- Sent JWT token in request headers for protected recall APIs
+- Cleared form after successful recall creation
