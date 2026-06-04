@@ -6,9 +6,9 @@ const generateToken = (user) => {
       id: user.id,
       email: user.email,
     },
-    "recall_secret_key",
+    process.env.JWT_SECRET,
     {
-      expiresIn: "1h",
+      expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
 };
