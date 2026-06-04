@@ -306,3 +306,98 @@ Before Day 10, passwords were stored directly in the database.
 - Connected recall form with backend API
 - Sent JWT token in request headers for protected recall APIs
 - Cleared form after successful recall creation
+
+## ✅ Day 18 Progress
+
+### Resource System Started
+- Added a new Resource model for saving learning resources
+- Designed resource fields for the upgraded Recall project
+- Connected each resource with the logged-in user
+- Added support for resource metadata like type, tags, priority, review date, and review count
+
+### Resource Model Fields
+- `title`
+- `url`
+- `description`
+- `type`
+- `tags`
+- `priority`
+- `reviewDate`
+- `reviewCount`
+- `isArchived`
+- `user`
+
+### Resource APIs Added
+- `POST /api/resources` — save a new learning resource
+- `GET /api/resources` — get all saved resources of the logged-in user
+
+### Backend Features Added
+- Created `resource.model.js`
+- Created `resource.controller.js`
+- Created `resource.routes.js`
+- Connected resource routes in `index.js`
+- Protected resource APIs using JWT authentication
+- Ensured users can only access their own saved resources
+
+### Learning Focus
+- Understanding how to design a MongoDB model for a real product feature
+- Understanding user-specific protected resources
+- Understanding how frontend/browser extension features will connect to backend APIs
+- Understanding how to structure new backend modules using model, controller, and routes
+
+### Current Status
+The Recall project now has a resource-saving backend foundation. Users can save learning resources like articles, videos, coding problems, documentation links, and notes through protected APIs.
+Day 18 API Documentation to Add
+
+In your README API section, add:
+
+## Resource APIs
+
+### Save Resource
+
+```http
+POST /api/resources
+
+Protected route.
+
+Headers:
+
+Authorization: Bearer <token>
+Content-Type: application/json
+
+Request body:
+
+{
+  "title": "JWT Authentication Explained",
+  "url": "https://example.com/jwt-authentication",
+  "description": "Important backend authentication concept for interviews.",
+  "type": "article",
+  "tags": ["backend", "jwt", "interview"],
+  "priority": "high"
+}
+Get Resources
+GET /api/resources
+
+Protected route.
+
+Headers:
+
+Authorization: Bearer <token>
+
+Small warning: because this README block contains code blocks inside code blocks, paste carefully. If VS Code formatting gets confusing, paste only the **Day 18 Progress** section first. API documentation can also be added later in final README.
+
+---
+
+# After commit
+
+After this is done, Day 18 is officially complete.
+
+Then we start:
+
+```text
+Day 19: Show saved resources on frontend dashboard
+
+Day 19 will connect the website with:
+
+POST /api/resources
+GET /api/resources
