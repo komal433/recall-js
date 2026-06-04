@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
+import "./style.css";
 
 const API_URL = "http://localhost:5000/api";
 
 function App() {
   const [mode, setMode] = useState("landing");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const [user, setUser] = useState(null);
-  const [recalls, setRecalls] = useState([]);
 
   const [registerData, setRegisterData] = useState({
     name: "",
@@ -21,58 +18,60 @@ function App() {
     password: "",
   });
 
-  const [recallData, setRecallData] = useState({
+  const [user, setUser] = useState(null);
+  const [resources, setResources] = useState([]);
+
+  const [resourceData, setResourceData] = useState({
     title: "",
-    content: "",
-    category: "General",
+    url: "",
+    description: "",
+    type: "article",
+    tags: "",
+    priority: "medium",
   });
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
-
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
-      setMode("dashboard");
-      fetchRecalls();
-    }
-  }, []);
 
   const getToken = () => {
     return localStorage.getItem("token");
   };
 
-  const fetchRecalls = async () => {
-    try {
-      const token = getToken();
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
 
-      const res = await fetch(`${API_URL}/recalls`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setMessage(data.message || "Failed to fetch recalls");
-        return;
-      }
-
-      setRecalls(data.recalls || []);
-    } catch (error) {
-      setMessage("Unable to load recalls");
+    if (savedUser && token) {
+      setUser(JSON.parse(savedUser));
+      setMode("dashboard");
+      fetchResources();
     }
+  }, []);
+
+  const handleRegisterChange = (e) => {
+    setRegisterData({
+      ...registerData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleLoginChange = (e) => {
+    setLoginData({
+      ...loginData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleResourceChange = (e) => {
+    setResourceData({
+      ...resourceData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setMessage("");
 
     try {
-      const res = await fetch(`${API_URL}/users/register`, {
+      const response = await fetch(`${API_URL}/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,29 +79,32 @@ function App() {
         body: JSON.stringify(registerData),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (!res.ok) {
+      if (!response.ok) {
         setMessage(data.message || "Registration failed");
         return;
       }
 
       setMessage("Account created successfully. Please login now.");
       setMode("login");
+
+      setRegisterData({
+        name: "",
+        email: "",
+        password: "",
+      });
     } catch (error) {
-      setMessage("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+      setMessage("Something went wrong while registering");
     }
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setMessage("");
 
     try {
-      const res = await fetch(`${API_URL}/users/login`, {
+      const response = await fetch(`${API_URL}/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,9 +112,9 @@ function App() {
         body: JSON.stringify(loginData),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (!res.ok) {
+      if (!response.ok) {
         setMessage(data.message || "Login failed");
         return;
       }
@@ -123,50 +125,87 @@ function App() {
       setUser(data.user);
       setMode("dashboard");
       setMessage("Login successful");
-      fetchRecalls();
+
+      setLoginData({
+        email: "",
+        password: "",
+      });
+
+      fetchResources();
     } catch (error) {
-      setMessage("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+      setMessage("Something went wrong while logging in");
     }
   };
 
-  const handleCreateRecall = async (e) => {
+  const fetchResources = async () => {
+    try {
+      const token = getToken();
+
+      const response = await fetch(`${API_URL}/resources`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Unable to load resources");
+        return;
+      }
+
+      setResources(data.resources);
+    } catch (error) {
+      setMessage("Something went wrong while loading resources");
+    }
+  };
+
+  const handleCreateResource = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setMessage("");
 
     try {
       const token = getToken();
 
-      const res = await fetch(`${API_URL}/recalls`, {
+      const formattedTags = resourceData.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag !== "");
+
+      const response = await fetch(`${API_URL}/resources`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(recallData),
+        body: JSON.stringify({
+          ...resourceData,
+          tags: formattedTags,
+        }),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (!res.ok) {
-        setMessage(data.message || "Failed to create recall");
+      if (!response.ok) {
+        setMessage(data.message || "Unable to save resource");
         return;
       }
 
-      setMessage("Recall created successfully");
-      setRecallData({
+      setMessage("Resource saved successfully");
+
+      setResourceData({
         title: "",
-        content: "",
-        category: "General",
+        url: "",
+        description: "",
+        type: "article",
+        tags: "",
+        priority: "medium",
       });
 
-      fetchRecalls();
+      fetchResources();
     } catch (error) {
-      setMessage("Something went wrong while creating recall");
-    } finally {
-      setLoading(false);
+      setMessage("Something went wrong while saving resource");
     }
   };
 
@@ -174,283 +213,280 @@ function App() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
-    setRecalls([]);
+    setResources([]);
     setMode("landing");
     setMessage("Logged out successfully");
   };
 
   return (
     <div className="app">
-      <nav className="navbar">
-        <div className="logo" onClick={() => setMode("landing")}>
-          Recall
-        </div>
-
-        <div className="nav-actions">
-          {user ? (
-            <>
-              <button onClick={() => setMode("dashboard")}>Dashboard</button>
-              <button className="secondary-btn" onClick={handleLogout}>
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <button onClick={() => setMode("landing")}>Home</button>
-              <button onClick={() => setMode("login")}>Login</button>
-              <button className="primary-btn" onClick={() => setMode("register")}>
-                Get Started
-              </button>
-            </>
-          )}
-        </div>
-      </nav>
-
       {mode === "landing" && (
-        <main className="hero">
-          <section className="hero-content">
-            <p className="badge">Backend-powered learning vault</p>
-
-            <h1>
-              Store what you learn.
-              <br />
-              Recall it when it matters.
-            </h1>
-
-            <p className="hero-text">
-              Recall helps you save important concepts, interview notes, backend
-              learnings, and revision points in one secure place.
+        <div className="hero">
+          <div className="hero-content">
+            <p className="badge">Recall</p>
+            <h1>Save what you learn. Review it at the right time.</h1>
+            <p className="subtitle">
+              A full-stack learning resource manager for saving articles,
+              videos, coding problems, interview notes, and backend concepts.
             </p>
 
-            <div className="hero-buttons">
-              <button className="primary-btn large" onClick={() => setMode("register")}>
-                Start Building Memory
-              </button>
-              <button className="secondary-btn large" onClick={() => setMode("login")}>
+            <div className="hero-actions">
+              <button onClick={() => setMode("register")}>Get Started</button>
+              <button className="secondary-btn" onClick={() => setMode("login")}>
                 Login
               </button>
             </div>
 
-            <div className="stats">
-              <div>
-                <h3>JWT</h3>
-                <p>Secure Auth</p>
-              </div>
-              <div>
-                <h3>MongoDB</h3>
-                <p>Cloud Storage</p>
-              </div>
-              <div>
-                <h3>CRUD</h3>
-                <p>User Recalls</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="preview-card">
-            <div className="card-header">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-
-            <div className="note-card">
-              <p className="note-category">Backend</p>
-              <h2>JWT Authentication</h2>
-              <p>
-                JWT is used for stateless authentication. After login, the
-                client stores a token and sends it with protected requests.
-              </p>
-            </div>
-
-            <div className="note-card faded">
-              <p className="note-category">Interview</p>
-              <h2>Ownership Checks</h2>
-              <p>
-                Users can only access, update, or delete the recalls that belong
-                to them.
-              </p>
-            </div>
-          </section>
-        </main>
+            {message && <p className="message">{message}</p>}
+          </div>
+        </div>
       )}
 
       {mode === "register" && (
-        <section className="auth-page">
-          <div className="auth-card">
-            <h2>Create your Recall account</h2>
-            <p>Start saving your learning notes securely.</p>
+        <div className="auth-container">
+          <form className="auth-card" onSubmit={handleRegister}>
+            <h2>Create account</h2>
+            <p>Start saving your learning resources.</p>
 
-            <form onSubmit={handleRegister}>
-              <input
-                type="text"
-                placeholder="Full name"
-                value={registerData.name}
-                onChange={(e) =>
-                  setRegisterData({ ...registerData, name: e.target.value })
-                }
-              />
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              value={registerData.name}
+              onChange={handleRegisterChange}
+              required
+            />
 
-              <input
-                type="email"
-                placeholder="Email address"
-                value={registerData.email}
-                onChange={(e) =>
-                  setRegisterData({ ...registerData, email: e.target.value })
-                }
-              />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={registerData.email}
+              onChange={handleRegisterChange}
+              required
+            />
 
-              <input
-                type="password"
-                placeholder="Password"
-                value={registerData.password}
-                onChange={(e) =>
-                  setRegisterData({ ...registerData, password: e.target.value })
-                }
-              />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={registerData.password}
+              onChange={handleRegisterChange}
+              required
+            />
 
-              <button className="primary-btn full" disabled={loading}>
-                {loading ? "Creating account..." : "Create Account"}
-              </button>
-            </form>
+            <button type="submit">Register</button>
 
             <p className="switch-text">
               Already have an account?{" "}
               <span onClick={() => setMode("login")}>Login</span>
             </p>
-          </div>
-        </section>
+
+            {message && <p className="message">{message}</p>}
+          </form>
+        </div>
       )}
 
       {mode === "login" && (
-        <section className="auth-page">
-          <div className="auth-card">
+        <div className="auth-container">
+          <form className="auth-card" onSubmit={handleLogin}>
             <h2>Welcome back</h2>
-            <p>Login to access your recall dashboard.</p>
+            <p>Login to open your Recall dashboard.</p>
 
-            <form onSubmit={handleLogin}>
-              <input
-                type="email"
-                placeholder="Email address"
-                value={loginData.email}
-                onChange={(e) =>
-                  setLoginData({ ...loginData, email: e.target.value })
-                }
-              />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={loginData.email}
+              onChange={handleLoginChange}
+              required
+            />
 
-              <input
-                type="password"
-                placeholder="Password"
-                value={loginData.password}
-                onChange={(e) =>
-                  setLoginData({ ...loginData, password: e.target.value })
-                }
-              />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={loginData.password}
+              onChange={handleLoginChange}
+              required
+            />
 
-              <button className="primary-btn full" disabled={loading}>
-                {loading ? "Logging in..." : "Login"}
-              </button>
-            </form>
+            <button type="submit">Login</button>
 
             <p className="switch-text">
-              New to Recall?{" "}
-              <span onClick={() => setMode("register")}>Create account</span>
+              New here? <span onClick={() => setMode("register")}>Register</span>
             </p>
-          </div>
-        </section>
+
+            {message && <p className="message">{message}</p>}
+          </form>
+        </div>
       )}
 
-      {mode === "dashboard" && user && (
-        <main className="dashboard">
-          <section className="dashboard-header">
+      {mode === "dashboard" && (
+        <div className="dashboard">
+          <div className="dashboard-header">
             <div>
-              <p className="badge">Your personal recall space</p>
-              <h1>Welcome back, {user.name}</h1>
-              <p>
-                Create, organize, and revisit your most important learning notes.
-              </p>
+              <p className="badge">Dashboard</p>
+              <h1>Welcome back, {user?.name}</h1>
+              <p>Save articles, videos, coding problems, and interview notes.</p>
             </div>
 
-            <div className="dashboard-stat">
-              <h2>{recalls.length}</h2>
-              <p>Total Recalls</p>
-            </div>
-          </section>
+            <button className="logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
 
-          <section className="dashboard-grid">
-            <div className="create-panel">
-              <h2>Create a new recall</h2>
-              <p>Save a concept, interview point, or backend learning.</p>
+          {message && <p className="message">{message}</p>}
 
-              <form onSubmit={handleCreateRecall}>
-                <input
-                  type="text"
-                  placeholder="Title"
-                  value={recallData.title}
-                  onChange={(e) =>
-                    setRecallData({ ...recallData, title: e.target.value })
-                  }
-                />
-
-                <textarea
-                  placeholder="Write your recall note..."
-                  value={recallData.content}
-                  onChange={(e) =>
-                    setRecallData({ ...recallData, content: e.target.value })
-                  }
-                ></textarea>
-
-                <input
-                  type="text"
-                  placeholder="Category"
-                  value={recallData.category}
-                  onChange={(e) =>
-                    setRecallData({ ...recallData, category: e.target.value })
-                  }
-                />
-
-                <button className="primary-btn full" disabled={loading}>
-                  {loading ? "Saving..." : "Save Recall"}
-                </button>
-              </form>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <h3>{resources.length}</h3>
+              <p>Total Resources</p>
             </div>
 
-            <div className="recalls-panel">
-              <div className="panel-title">
-                <h2>Your recalls</h2>
-                <button className="secondary-btn" onClick={fetchRecalls}>
+            <div className="stat-card">
+              <h3>
+                {resources.filter((resource) => resource.priority === "high").length}
+              </h3>
+              <p>High Priority</p>
+            </div>
+
+            <div className="stat-card">
+              <h3>
+                {resources.filter((resource) => resource.type === "video").length}
+              </h3>
+              <p>Videos Saved</p>
+            </div>
+          </div>
+
+          <div className="dashboard-grid">
+            <form className="create-panel" onSubmit={handleCreateResource}>
+              <h2>Save a new resource</h2>
+              <p>Add a learning resource you want to revise later.</p>
+
+              <input
+                type="text"
+                name="title"
+                placeholder="Resource title"
+                value={resourceData.title}
+                onChange={handleResourceChange}
+                required
+              />
+
+              <input
+                type="url"
+                name="url"
+                placeholder="Resource URL"
+                value={resourceData.url}
+                onChange={handleResourceChange}
+                required
+              />
+
+              <textarea
+                name="description"
+                placeholder="Short description"
+                value={resourceData.description}
+                onChange={handleResourceChange}
+              ></textarea>
+
+              <select
+                name="type"
+                value={resourceData.type}
+                onChange={handleResourceChange}
+              >
+                <option value="article">Article</option>
+                <option value="video">Video</option>
+                <option value="problem">Coding Problem</option>
+                <option value="note">Note</option>
+                <option value="documentation">Documentation</option>
+                <option value="other">Other</option>
+              </select>
+
+              <input
+                type="text"
+                name="tags"
+                placeholder="Tags: backend, jwt, interview"
+                value={resourceData.tags}
+                onChange={handleResourceChange}
+              />
+
+              <select
+                name="priority"
+                value={resourceData.priority}
+                onChange={handleResourceChange}
+              >
+                <option value="low">Low Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="high">High Priority</option>
+              </select>
+
+              <button type="submit">Save Resource</button>
+            </form>
+
+            <div className="resources-panel">
+              <div className="panel-header">
+                <div>
+                  <h2>Saved Resources</h2>
+                  <p>Your learning resources from MongoDB.</p>
+                </div>
+
+                <button className="secondary-btn" onClick={fetchResources}>
                   Refresh
                 </button>
               </div>
 
-              {recalls.length === 0 ? (
+              {resources.length === 0 ? (
                 <div className="empty-state">
-                  <h3>No recalls yet</h3>
-                  <p>Create your first recall note from the form.</p>
+                  <h3>No resources saved yet</h3>
+                  <p>Save your first article, video, problem, or note.</p>
                 </div>
               ) : (
-                <div className="recall-list">
-                  {recalls.map((recall) => (
-                    <article className="recall-card" key={recall._id}>
-                      <div className="recall-top">
-                        <span>{recall.category || "General"}</span>
-                        <small>
-                          {new Date(recall.createdAt).toLocaleDateString()}
-                        </small>
+                <div className="resource-list">
+                  {resources.map((resource) => (
+                    <div className="resource-card" key={resource._id}>
+                      <div className="resource-top">
+                        <span className="type-badge">{resource.type}</span>
+                        <span className={`priority ${resource.priority}`}>
+                          {resource.priority}
+                        </span>
                       </div>
 
-                      <h3>{recall.title}</h3>
-                      <p>{recall.content}</p>
-                    </article>
+                      <h3>{resource.title}</h3>
+
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="resource-link"
+                      >
+                        Open Resource
+                      </a>
+
+                      <p>{resource.description}</p>
+
+                      <div className="tag-row">
+                        {resource.tags?.map((tag, index) => (
+                          <span className="tag" key={index}>
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="resource-footer">
+                        <span>
+                          Review:{" "}
+                          {new Date(resource.reviewDate).toLocaleDateString()}
+                        </span>
+                        <span>Reviews: {resource.reviewCount}</span>
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
             </div>
-          </section>
-        </main>
+          </div>
+        </div>
       )}
-
-      {message && <div className="toast">{message}</div>}
     </div>
   );
 }
