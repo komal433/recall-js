@@ -654,3 +654,87 @@ select {
 .panel-header .secondary-btn:hover {
   background: #1e293b;
 }
+.filter-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto auto;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.filter-box input {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #334155;
+  background: #111827;
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+.filter-box .secondary-btn {
+  width: auto;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid #334155;
+  background: #111827;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filter-box .secondary-btn:hover {
+  background: #1e293b;
+}
+
+.resource-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.edit-btn,
+.delete-btn,
+.cancel-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 18px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background: #2563eb;
+}
+
+.delete-btn {
+  background: #dc2626;
+}
+
+.cancel-btn {
+  margin-top: 12px;
+  background: #475569;
+  width: 100%;
+}
+
+.edit-btn:hover {
+  background: #1d4ed8;
+}
+
+.delete-btn:hover {
+  background: #b91c1c;
+}
+
+.cancel-btn:hover {
+  background: #334155;
+}
+
+@media (max-width: 1000px) {
+  .filter-box {
+    grid-template-columns: 1fr;
+  }
+
+  .resource-actions {
+    flex-direction: column;
+  }
+}

@@ -334,3 +334,12 @@ Before Day 10, passwords were stored directly in the database.
 - Added a resource creation form on the dashboard
 - Allowed users to save learning resources directly from the website
 - Fetched saved resources from MongoDB and displayed them on the dashboard
+
+## ✅ Day 20 Progress
+
+- Added filters for resources by type, priority, and tag
+- Added edit resource functionality
+- Added delete/archive resource functionality
+- Updated dashboard UI with filter controls and edit/delete buttons
+- Added backend APIs for updating and deleting resources
+- Used soft delete with `isArchived: true`

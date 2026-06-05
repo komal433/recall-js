@@ -6,9 +6,13 @@ const authMiddleware = require("../middleware/auth.middleware");
 const {
   createResource,
   getResources,
+  updateResource,
+  deleteResource,
 } = require("../controllers/resource.controller");
 
 router.post("/", authMiddleware, createResource);
 router.get("/", authMiddleware, getResources);
+router.put("/:id", authMiddleware, updateResource);
+router.delete("/:id", authMiddleware, deleteResource);
 
 module.exports = router;

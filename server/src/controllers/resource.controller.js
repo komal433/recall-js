@@ -28,10 +28,26 @@ const createResource = asyncHandler(async (req, res) => {
 });
 
 const getResources = asyncHandler(async (req, res) => {
-  const resources = await Resource.find({
+  const { type, priority, tag } = req.query;
+
+  const filter = {
     user: req.user.id,
     isArchived: false,
-  }).sort({
+  };
+
+  if (type) {
+    filter.type = type;
+  }
+
+  if (priority) {
+    filter.priority = priority;
+  }
+
+  if (tag) {
+    filter.tags = tag;
+  }
+
+  const resources = await Resource.find(filter).sort({
     createdAt: -1,
   });
 
@@ -42,7 +58,62 @@ const getResources = asyncHandler(async (req, res) => {
   });
 });
 
+const updateResource = asyncHandler(async (req, res) => {
+  const resource = await Resource.findOne({
+    _id: req.params.id,
+    user: req.user.id,
+    isArchived: false,
+  });
+
+  if (!resource) {
+    res.status(404);
+    throw new Error("Resource not found");
+  }
+
+  const { title, url, description, type, tags, priority, reviewDate } = req.body;
+
+  resource.title = title || resource.title;
+  resource.url = url || resource.url;
+  resource.description =
+    description !== undefined ? description : resource.description;
+  resource.type = type || resource.type;
+  resource.tags = tags || resource.tags;
+  resource.priority = priority || resource.priority;
+  resource.reviewDate = reviewDate || resource.reviewDate;
+
+  const updatedResource = await resource.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Resource updated successfully",
+    resource: updatedResource,
+  });
+});
+
+const deleteResource = asyncHandler(async (req, res) => {
+  const resource = await Resource.findOne({
+    _id: req.params.id,
+    user: req.user.id,
+    isArchived: false,
+  });
+
+  if (!resource) {
+    res.status(404);
+    throw new Error("Resource not found");
+  }
+
+  resource.isArchived = true;
+  await resource.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Resource deleted successfully",
+  });
+});
+
 module.exports = {
   createResource,
   getResources,
+  updateResource,
+  deleteResource,
 };

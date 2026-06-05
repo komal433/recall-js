@@ -30,6 +30,14 @@ function App() {
     priority: "medium",
   });
 
+  const [filters, setFilters] = useState({
+    type: "",
+    priority: "",
+    tag: "",
+  });
+
+  const [editingResourceId, setEditingResourceId] = useState(null);
+
   const getToken = () => {
     return localStorage.getItem("token");
   };
@@ -62,6 +70,13 @@ function App() {
   const handleResourceChange = (e) => {
     setResourceData({
       ...resourceData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
       [e.target.name]: e.target.value,
     });
   };
@@ -141,12 +156,31 @@ function App() {
     try {
       const token = getToken();
 
-      const response = await fetch(`${API_URL}/resources`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const queryParams = new URLSearchParams();
+
+      if (filters.type) {
+        queryParams.append("type", filters.type);
+      }
+
+      if (filters.priority) {
+        queryParams.append("priority", filters.priority);
+      }
+
+      if (filters.tag) {
+        queryParams.append("tag", filters.tag);
+      }
+
+      const queryString = queryParams.toString();
+
+      const response = await fetch(
+        `${API_URL}/resources${queryString ? `?${queryString}` : ""}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const data = await response.json();
 
@@ -207,6 +241,127 @@ function App() {
     } catch (error) {
       setMessage("Something went wrong while saving resource");
     }
+  };
+
+  const handleEditClick = (resource) => {
+    setEditingResourceId(resource._id);
+
+    setResourceData({
+      title: resource.title,
+      url: resource.url,
+      description: resource.description,
+      type: resource.type,
+      tags: resource.tags.join(", "),
+      priority: resource.priority,
+    });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleUpdateResource = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    try {
+      const token = getToken();
+
+      const formattedTags = resourceData.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag !== "");
+
+      const response = await fetch(`${API_URL}/resources/${editingResourceId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...resourceData,
+          tags: formattedTags,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Unable to update resource");
+        return;
+      }
+
+      setMessage("Resource updated successfully");
+      setEditingResourceId(null);
+
+      setResourceData({
+        title: "",
+        url: "",
+        description: "",
+        type: "article",
+        tags: "",
+        priority: "medium",
+      });
+
+      fetchResources();
+    } catch (error) {
+      setMessage("Something went wrong while updating resource");
+    }
+  };
+
+  const handleDeleteResource = async (resourceId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this resource?"
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      const token = getToken();
+
+      const response = await fetch(`${API_URL}/resources/${resourceId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Unable to delete resource");
+        return;
+      }
+
+      setMessage("Resource deleted successfully");
+      fetchResources();
+    } catch (error) {
+      setMessage("Something went wrong while deleting resource");
+    }
+  };
+
+  const clearEditForm = () => {
+    setEditingResourceId(null);
+
+    setResourceData({
+      title: "",
+      url: "",
+      description: "",
+      type: "article",
+      tags: "",
+      priority: "medium",
+    });
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      type: "",
+      priority: "",
+      tag: "",
+    });
   };
 
   const handleLogout = () => {
@@ -360,9 +515,19 @@ function App() {
           </div>
 
           <div className="dashboard-grid">
-            <form className="create-panel" onSubmit={handleCreateResource}>
-              <h2>Save a new resource</h2>
-              <p>Add a learning resource you want to revise later.</p>
+            <form
+              className="create-panel"
+              onSubmit={
+                editingResourceId ? handleUpdateResource : handleCreateResource
+              }
+            >
+              <h2>{editingResourceId ? "Edit resource" : "Save a new resource"}</h2>
+
+              <p>
+                {editingResourceId
+                  ? "Update your saved learning resource."
+                  : "Add a learning resource you want to revise later."}
+              </p>
 
               <input
                 type="text"
@@ -420,7 +585,15 @@ function App() {
                 <option value="high">High Priority</option>
               </select>
 
-              <button type="submit">Save Resource</button>
+              <button type="submit">
+                {editingResourceId ? "Update Resource" : "Save Resource"}
+              </button>
+
+              {editingResourceId && (
+                <button type="button" className="cancel-btn" onClick={clearEditForm}>
+                  Cancel Edit
+                </button>
+              )}
             </form>
 
             <div className="resources-panel">
@@ -435,10 +608,53 @@ function App() {
                 </button>
               </div>
 
+              <div className="filter-box">
+                <select
+                  name="type"
+                  value={filters.type}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">All Types</option>
+                  <option value="article">Article</option>
+                  <option value="video">Video</option>
+                  <option value="problem">Coding Problem</option>
+                  <option value="note">Note</option>
+                  <option value="documentation">Documentation</option>
+                  <option value="other">Other</option>
+                </select>
+
+                <select
+                  name="priority"
+                  value={filters.priority}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">All Priorities</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+
+                <input
+                  type="text"
+                  name="tag"
+                  placeholder="Filter by tag"
+                  value={filters.tag}
+                  onChange={handleFilterChange}
+                />
+
+                <button className="secondary-btn" onClick={fetchResources}>
+                  Apply Filters
+                </button>
+
+                <button className="secondary-btn" onClick={clearFilters}>
+                  Clear
+                </button>
+              </div>
+
               {resources.length === 0 ? (
                 <div className="empty-state">
-                  <h3>No resources saved yet</h3>
-                  <p>Save your first article, video, problem, or note.</p>
+                  <h3>No resources found</h3>
+                  <p>Save a new resource or clear filters.</p>
                 </div>
               ) : (
                 <div className="resource-list">
@@ -478,6 +694,22 @@ function App() {
                           {new Date(resource.reviewDate).toLocaleDateString()}
                         </span>
                         <span>Reviews: {resource.reviewCount}</span>
+                      </div>
+
+                      <div className="resource-actions">
+                        <button
+                          className="edit-btn"
+                          onClick={() => handleEditClick(resource)}
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDeleteResource(resource._id)}
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
                   ))}
