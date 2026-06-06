@@ -343,3 +343,12 @@ Before Day 10, passwords were stored directly in the database.
 - Updated dashboard UI with filter controls and edit/delete buttons
 - Added backend APIs for updating and deleting resources
 - Used soft delete with `isArchived: true`
+
+## ✅ Day 21 Progress
+
+- Added spaced review scheduling logic
+- Added `lastReviewedAt` field in Resource model
+- Added Today's Recall backend API
+- Added Mark as Reviewed backend API
+- Review count now increases after marking a resource as reviewed
+- Next review date is automatically scheduled based on review count

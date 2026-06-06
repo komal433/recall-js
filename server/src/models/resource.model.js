@@ -47,6 +47,11 @@ const resourceSchema = new mongoose.Schema(
       default: 0,
     },
 
+    lastReviewedAt: {
+      type: Date,
+      default: null,
+    },
+
     isArchived: {
       type: Boolean,
       default: false,

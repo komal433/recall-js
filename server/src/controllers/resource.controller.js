@@ -1,5 +1,6 @@
 const asyncHandler = require("../utils/asyncHandler");
 const Resource = require("../models/resource.model");
+const calculateNextReviewDate = require("../utils/reviewScheduler");
 
 const createResource = asyncHandler(async (req, res) => {
   const { title, url, description, type, tags, priority, reviewDate } = req.body;
@@ -58,6 +59,27 @@ const getResources = asyncHandler(async (req, res) => {
   });
 });
 
+const getTodayResources = asyncHandler(async (req, res) => {
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
+
+  const resources = await Resource.find({
+    user: req.user.id,
+    isArchived: false,
+    reviewDate: {
+      $lte: endOfToday,
+    },
+  }).sort({
+    reviewDate: 1,
+  });
+
+  return res.status(200).json({
+    success: true,
+    count: resources.length,
+    resources,
+  });
+});
+
 const updateResource = asyncHandler(async (req, res) => {
   const resource = await Resource.findOne({
     _id: req.params.id,
@@ -90,6 +112,33 @@ const updateResource = asyncHandler(async (req, res) => {
   });
 });
 
+const markResourceReviewed = asyncHandler(async (req, res) => {
+  const resource = await Resource.findOne({
+    _id: req.params.id,
+    user: req.user.id,
+    isArchived: false,
+  });
+
+  if (!resource) {
+    res.status(404);
+    throw new Error("Resource not found");
+  }
+
+  const nextReviewDate = calculateNextReviewDate(resource.reviewCount);
+
+  resource.reviewCount = resource.reviewCount + 1;
+  resource.lastReviewedAt = new Date();
+  resource.reviewDate = nextReviewDate;
+
+  const updatedResource = await resource.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Resource marked as reviewed",
+    resource: updatedResource,
+  });
+});
+
 const deleteResource = asyncHandler(async (req, res) => {
   const resource = await Resource.findOne({
     _id: req.params.id,
@@ -114,6 +163,8 @@ const deleteResource = asyncHandler(async (req, res) => {
 module.exports = {
   createResource,
   getResources,
+  getTodayResources,
   updateResource,
+  markResourceReviewed,
   deleteResource,
 };
