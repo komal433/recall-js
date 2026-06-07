@@ -352,3 +352,12 @@ Before Day 10, passwords were stored directly in the database.
 - Added Mark as Reviewed backend API
 - Review count now increases after marking a resource as reviewed
 - Next review date is automatically scheduled based on review count
+
+## ✅ Day 22 Progress
+
+- Added Today's Recall tab on the dashboard
+- Connected frontend with `GET /api/resources/today`
+- Added Mark Reviewed button for due resources
+- Connected frontend with `PATCH /api/resources/:id/review`
+- Updated dashboard stats to show resources due today
+- After review, resource is moved to a future review date

@@ -20,6 +20,8 @@ function App() {
 
   const [user, setUser] = useState(null);
   const [resources, setResources] = useState([]);
+  const [todayResources, setTodayResources] = useState([]);
+  const [activeTab, setActiveTab] = useState("all");
 
   const [resourceData, setResourceData] = useState({
     title: "",
@@ -50,6 +52,7 @@ function App() {
       setUser(JSON.parse(savedUser));
       setMode("dashboard");
       fetchResources();
+      fetchTodayResources();
     }
   }, []);
 
@@ -147,27 +150,28 @@ function App() {
       });
 
       fetchResources();
+      fetchTodayResources();
     } catch (error) {
       setMessage("Something went wrong while logging in");
     }
   };
 
-  const fetchResources = async () => {
+  const fetchResources = async (customFilters = filters) => {
     try {
       const token = getToken();
 
       const queryParams = new URLSearchParams();
 
-      if (filters.type) {
-        queryParams.append("type", filters.type);
+      if (customFilters.type) {
+        queryParams.append("type", customFilters.type);
       }
 
-      if (filters.priority) {
-        queryParams.append("priority", filters.priority);
+      if (customFilters.priority) {
+        queryParams.append("priority", customFilters.priority);
       }
 
-      if (filters.tag) {
-        queryParams.append("tag", filters.tag);
+      if (customFilters.tag) {
+        queryParams.append("tag", customFilters.tag);
       }
 
       const queryString = queryParams.toString();
@@ -192,6 +196,30 @@ function App() {
       setResources(data.resources);
     } catch (error) {
       setMessage("Something went wrong while loading resources");
+    }
+  };
+
+  const fetchTodayResources = async () => {
+    try {
+      const token = getToken();
+
+      const response = await fetch(`${API_URL}/resources/today`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Unable to load today's recalls");
+        return;
+      }
+
+      setTodayResources(data.resources);
+    } catch (error) {
+      setMessage("Something went wrong while loading today's recalls");
     }
   };
 
@@ -238,6 +266,7 @@ function App() {
       });
 
       fetchResources();
+      fetchTodayResources();
     } catch (error) {
       setMessage("Something went wrong while saving resource");
     }
@@ -305,6 +334,7 @@ function App() {
       });
 
       fetchResources();
+      fetchTodayResources();
     } catch (error) {
       setMessage("Something went wrong while updating resource");
     }
@@ -338,8 +368,36 @@ function App() {
 
       setMessage("Resource deleted successfully");
       fetchResources();
+      fetchTodayResources();
     } catch (error) {
       setMessage("Something went wrong while deleting resource");
+    }
+  };
+
+  const handleMarkReviewed = async (resourceId) => {
+    try {
+      const token = getToken();
+
+      const response = await fetch(`${API_URL}/resources/${resourceId}/review`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Unable to mark resource as reviewed");
+        return;
+      }
+
+      setMessage("Resource marked as reviewed");
+
+      fetchResources();
+      fetchTodayResources();
+    } catch (error) {
+      setMessage("Something went wrong while marking resource as reviewed");
     }
   };
 
@@ -357,11 +415,14 @@ function App() {
   };
 
   const clearFilters = () => {
-    setFilters({
+    const emptyFilters = {
       type: "",
       priority: "",
       tag: "",
-    });
+    };
+
+    setFilters(emptyFilters);
+    fetchResources(emptyFilters);
   };
 
   const handleLogout = () => {
@@ -369,9 +430,12 @@ function App() {
     localStorage.removeItem("user");
     setUser(null);
     setResources([]);
+    setTodayResources([]);
     setMode("landing");
     setMessage("Logged out successfully");
   };
+
+  const displayedResources = activeTab === "all" ? resources : todayResources;
 
   return (
     <div className="app">
@@ -501,16 +565,28 @@ function App() {
 
             <div className="stat-card">
               <h3>
-                {resources.filter((resource) => resource.priority === "high").length}
+                {
+                  resources.filter(
+                    (resource) => resource.priority === "high"
+                  ).length
+                }
               </h3>
               <p>High Priority</p>
             </div>
 
             <div className="stat-card">
               <h3>
-                {resources.filter((resource) => resource.type === "video").length}
+                {
+                  resources.filter((resource) => resource.type === "video")
+                    .length
+                }
               </h3>
               <p>Videos Saved</p>
+            </div>
+
+            <div className="stat-card">
+              <h3>{todayResources.length}</h3>
+              <p>Due Today</p>
             </div>
           </div>
 
@@ -521,7 +597,9 @@ function App() {
                 editingResourceId ? handleUpdateResource : handleCreateResource
               }
             >
-              <h2>{editingResourceId ? "Edit resource" : "Save a new resource"}</h2>
+              <h2>
+                {editingResourceId ? "Edit resource" : "Save a new resource"}
+              </h2>
 
               <p>
                 {editingResourceId
@@ -597,68 +675,115 @@ function App() {
             </form>
 
             <div className="resources-panel">
+              <div className="dashboard-tabs">
+                <button
+                  className={activeTab === "all" ? "tab-btn active" : "tab-btn"}
+                  onClick={() => {
+                    setActiveTab("all");
+                    fetchResources();
+                  }}
+                >
+                  All Resources
+                </button>
+
+                <button
+                  className={
+                    activeTab === "today" ? "tab-btn active" : "tab-btn"
+                  }
+                  onClick={() => {
+                    setActiveTab("today");
+                    fetchTodayResources();
+                  }}
+                >
+                  Today's Recall
+                </button>
+              </div>
+
               <div className="panel-header">
                 <div>
-                  <h2>Saved Resources</h2>
-                  <p>Your learning resources from MongoDB.</p>
+                  <h2>
+                    {activeTab === "all"
+                      ? "Saved Resources"
+                      : "Today's Recall"}
+                  </h2>
+                  <p>
+                    {activeTab === "all"
+                      ? "Your learning resources from MongoDB."
+                      : "Resources due today or overdue for review."}
+                  </p>
                 </div>
 
-                <button className="secondary-btn" onClick={fetchResources}>
+                <button
+                  className="secondary-btn"
+                  onClick={
+                    activeTab === "all" ? fetchResources : fetchTodayResources
+                  }
+                >
                   Refresh
                 </button>
               </div>
 
-              <div className="filter-box">
-                <select
-                  name="type"
-                  value={filters.type}
-                  onChange={handleFilterChange}
-                >
-                  <option value="">All Types</option>
-                  <option value="article">Article</option>
-                  <option value="video">Video</option>
-                  <option value="problem">Coding Problem</option>
-                  <option value="note">Note</option>
-                  <option value="documentation">Documentation</option>
-                  <option value="other">Other</option>
-                </select>
+              {activeTab === "all" && (
+                <div className="filter-box">
+                  <select
+                    name="type"
+                    value={filters.type}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="">All Types</option>
+                    <option value="article">Article</option>
+                    <option value="video">Video</option>
+                    <option value="problem">Coding Problem</option>
+                    <option value="note">Note</option>
+                    <option value="documentation">Documentation</option>
+                    <option value="other">Other</option>
+                  </select>
 
-                <select
-                  name="priority"
-                  value={filters.priority}
-                  onChange={handleFilterChange}
-                >
-                  <option value="">All Priorities</option>
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
+                  <select
+                    name="priority"
+                    value={filters.priority}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="">All Priorities</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
 
-                <input
-                  type="text"
-                  name="tag"
-                  placeholder="Filter by tag"
-                  value={filters.tag}
-                  onChange={handleFilterChange}
-                />
+                  <input
+                    type="text"
+                    name="tag"
+                    placeholder="Filter by tag"
+                    value={filters.tag}
+                    onChange={handleFilterChange}
+                  />
 
-                <button className="secondary-btn" onClick={fetchResources}>
-                  Apply Filters
-                </button>
+                  <button className="secondary-btn" onClick={() => fetchResources()}>
+                    Apply Filters
+                  </button>
 
-                <button className="secondary-btn" onClick={clearFilters}>
-                  Clear
-                </button>
-              </div>
+                  <button className="secondary-btn" onClick={clearFilters}>
+                    Clear
+                  </button>
+                </div>
+              )}
 
-              {resources.length === 0 ? (
+              {displayedResources.length === 0 ? (
                 <div className="empty-state">
-                  <h3>No resources found</h3>
-                  <p>Save a new resource or clear filters.</p>
+                  <h3>
+                    {activeTab === "all"
+                      ? "No resources found"
+                      : "No recalls due today"}
+                  </h3>
+                  <p>
+                    {activeTab === "all"
+                      ? "Save a new resource or clear filters."
+                      : "You are done for today. Reviewed resources will appear later."}
+                  </p>
                 </div>
               ) : (
                 <div className="resource-list">
-                  {resources.map((resource) => (
+                  {displayedResources.map((resource) => (
                     <div className="resource-card" key={resource._id}>
                       <div className="resource-top">
                         <span className="type-badge">{resource.type}</span>
@@ -710,6 +835,15 @@ function App() {
                         >
                           Delete
                         </button>
+
+                        {activeTab === "today" && (
+                          <button
+                            className="review-btn"
+                            onClick={() => handleMarkReviewed(resource._id)}
+                          >
+                            Mark Reviewed
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
