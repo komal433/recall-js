@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recall Quick Save</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+
+  <body>
+    <div class="popup-container">
+      <div class="popup-header">
+        <p class="badge">Recall</p>
+        <h1>Quick Save</h1>
+        <p>Save this page as a learning resource.</p>
+      </div>
+
+      <form id="resourceForm">
+        <label>Title</label>
+        <input type="text" id="title" placeholder="Page title" required />
+
+        <label>URL</label>
+        <input type="url" id="url" placeholder="Page URL" required />
+
+        <label>Description</label>
+        <textarea
+          id="description"
+          placeholder="Why are you saving this?"
+        ></textarea>
+
+        <label>Type</label>
+        <select id="type">
+          <option value="article">Article</option>
+          <option value="video">Video</option>
+          <option value="problem">Coding Problem</option>
+          <option value="note">Note</option>
+          <option value="documentation">Documentation</option>
+          <option value="other">Other</option>
+        </select>
+
+        <label>Tags</label>
+        <input
+          type="text"
+          id="tags"
+          placeholder="backend, jwt, interview"
+        />
+
+        <label>Priority</label>
+        <select id="priority">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+        </select>
+
+        <button type="submit">Save Resource</button>
+      </form>
+
+      <p id="message"></p>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

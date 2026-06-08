@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Recall Quick Save",
+  "version": "1.0.0",
+  "description": "Save learning resources quickly from any webpage.",
+  "permissions": ["activeTab", "tabs"],
+  "action": {
+    "default_title": "Recall Quick Save",
+    "default_popup": "popup.html"
+  }
+}

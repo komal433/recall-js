@@ -361,3 +361,12 @@ Before Day 10, passwords were stored directly in the database.
 - Connected frontend with `PATCH /api/resources/:id/review`
 - Updated dashboard stats to show resources due today
 - After review, resource is moved to a future review date
+
+## ✅ Day 23 Progress
+
+- Created Chrome extension folder for Recall Quick Save
+- Added extension manifest file
+- Built popup UI for saving current webpage as a resource
+- Captured current tab title and URL automatically
+- Added fields for description, type, tags, and priority
+- Added temporary save message before backend connection

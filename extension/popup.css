@@ -1,0 +1,100 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 360px;
+  min-height: 520px;
+  background: #0f172a;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+}
+
+.popup-container {
+  padding: 20px;
+}
+
+.popup-header {
+  margin-bottom: 18px;
+}
+
+.badge {
+  display: inline-block;
+  background: #312e81;
+  color: #c4b5fd;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.popup-header h1 {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.popup-header p {
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+label {
+  color: #e5e7eb;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  background: #111827;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #2563eb;
+}
+
+button {
+  margin-top: 8px;
+  border: none;
+  border-radius: 14px;
+  padding: 13px;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.95;
+}
+
+#message {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 14px;
+  color: #a7f3d0;
+}
