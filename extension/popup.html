@@ -15,6 +15,16 @@
         <p>Save this page as a learning resource.</p>
       </div>
 
+      <div class="token-box">
+        <label>JWT Token</label>
+        <input
+          type="password"
+          id="token"
+          placeholder="Paste your Recall login token"
+        />
+        <button type="button" id="saveTokenBtn">Save Token</button>
+      </div>
+
       <form id="resourceForm">
         <label>Title</label>
         <input type="text" id="title" placeholder="Page title" required />
@@ -39,11 +49,7 @@
         </select>
 
         <label>Tags</label>
-        <input
-          type="text"
-          id="tags"
-          placeholder="backend, jwt, interview"
-        />
+        <input type="text" id="tags" placeholder="backend, jwt, interview" />
 
         <label>Priority</label>
         <select id="priority">

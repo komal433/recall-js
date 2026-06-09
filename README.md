@@ -370,3 +370,12 @@ Before Day 10, passwords were stored directly in the database.
 - Captured current tab title and URL automatically
 - Added fields for description, type, tags, and priority
 - Added temporary save message before backend connection
+
+## ✅ Day 24 Progress
+
+- Connected Chrome extension with backend API
+- Added JWT token input in extension popup
+- Saved JWT token inside extension localStorage
+- Extension now sends saved resource data to backend
+- Connected extension with `POST /api/resources`
+- Verified that resources saved from extension appear in MongoDB and dashboard

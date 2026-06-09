@@ -98,3 +98,27 @@ button:hover {
   font-size: 14px;
   color: #a7f3d0;
 }
+
+.token-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #334155;
+  background: #111827;
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.token-box button {
+  margin-top: 0;
+  background: #334155;
+}
+
+#message.success {
+  color: #a7f3d0;
+}
+
+#message.error {
+  color: #fecaca;
+}
