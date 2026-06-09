@@ -1,12 +1,19 @@
 # Recall – Backend Focused Project
 
-Recall is a backend-focused full-stack project where users can securely store and revisit important concepts, interview notes, and learning points.
+## Project Overview
 
-The project focuses on real-world backend development concepts such as authentication, protected routes, MongoDB database integration, password hashing, environment variables, centralized error handling, and user-specific CRUD operations.
+Recall is a full-stack learning resource manager that helps users save, organize, and review important learning resources.
+
+Users can save articles, videos, coding problems, documentation links, and notes. The project includes authentication, resource management, filtering, spaced review scheduling, Today's Recall, and a Chrome extension for quick-saving webpages.
+
+The main focus of this project is backend architecture, protected APIs, MongoDB data modeling, review scheduling logic, and browser extension integration.
 
 
 ## Tech Stack
+
 - JavaScript
+- React
+- Vite
 - Node.js
 - Express.js
 - MongoDB Atlas
@@ -14,104 +21,90 @@ The project focuses on real-world backend development concepts such as authentic
 - JWT
 - bcryptjs
 - dotenv
+- Chrome Extension Manifest V3
 - Postman
+- Git and GitHub
+
 
 ## Features
 
-- User registration
-- User login
+- User registration and login
 - JWT-based authentication
-- Protected profile route
 - Password hashing using bcryptjs
-- MongoDB Atlas database connection
-- Mongoose-based user model
-- Environment variable based configuration
+- Protected backend routes
+- MongoDB Atlas database integration
+- Save learning resources
+- View saved resources
+- Filter resources by type, priority, and tag
+- Edit and delete/archive resources
+- Spaced review scheduling
+- Today's Recall page
+- Mark resources as reviewed
+- Chrome extension quick-save
+- User-specific resource ownership
 - Centralized error handling
-- Async error handling utility
-- Create recall notes
-- View all recall notes of logged-in user
-- View a single recall note
-- Update recall note
-- Delete recall note
-- Ownership protection for recall notes
-- Clean backend folder structure
-- API testing using Postman
+
+## Architecture
+
+```text
+React Frontend
+     |
+     |  HTTP requests with JWT
+     v
+Express Backend
+     |
+     |  Mongoose
+     v
+MongoDB Atlas
+
+
+Chrome Extension
+     |
+     |  Quick-save request with JWT
+     v
+Express Backend
+     |
+     |  Mongoose
+     v
+MongoDB Atlas
+
 
 ## API Documentation
 
 ### User APIs
 
-| Method | Endpoint | Description | Protected |
-|---|---|---|---|
-| POST | `/api/users/register` | Register a new user | No |
-| POST | `/api/users/login` | Login user and return JWT token | No |
-| GET | `/api/users/profile` | Get logged-in user profile data | Yes |
+- `POST /api/users/register`
+- `POST /api/users/login`
+- `GET /api/users/profile`
 
-### Recall APIs
+### Resource APIs
 
-| Method | Endpoint | Description | Protected |
-|---|---|---|---|
-| POST | `/api/recalls` | Create a new recall note | Yes |
-| GET | `/api/recalls` | Get all recalls of logged-in user | Yes |
-| GET | `/api/recalls/:id` | Get a single recall by ID | Yes |
-| PUT | `/api/recalls/:id` | Update a recall by ID | Yes |
-| DELETE | `/api/recalls/:id` | Delete a recall by ID | Yes |
+- `POST /api/resources`
+- `GET /api/resources`
+- `GET /api/resources/today`
+- `PUT /api/resources/:id`
+- `PATCH /api/resources/:id/review`
+- `DELETE /api/resources/:id`
 
-## Setup Instructions
+## Chrome Extension
 
-### 1. Clone the repository
+Recall includes a Chrome extension for quick-saving learning resources from any webpage.
 
-```bash
-git clone <repository-url>
-cd recall-js
-```
+The extension can:
 
-### 2. Install backend dependencies
+- Read the current webpage title
+- Read the current webpage URL
+- Accept description, tags, type, and priority
+- Save the resource to the backend using JWT authentication
+- Show the saved resource on the Recall dashboard
 
-```bash
-cd server
-npm install
-```
+## Setup
 
-### 3. Create `.env` file
+Backend runs from the `server` folder and frontend runs from the `client` folder.
 
-Create a `.env` file inside the `server` folder.
+Required environment variables are stored in `server/.env`.
 
-```env
-PORT=5000
-MONGO_URI=your_mongodb_atlas_connection_string
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=1h
-```
-
-### 4. Start backend server
-
-```bash
-npm run dev
-```
-
-Server will run on:
-
-http://localhost:5000
-```
-## Learning Outcomes
-
-Through this project, I learned:
-
-- How to structure a backend project
-- How routes, controllers, models, middleware, utils, and config files work together
-- How to create REST APIs using Express.js
-- How to connect backend with MongoDB Atlas
-- How to create Mongoose schemas and models
-- How JWT authentication works
-- How protected routes are implemented
-- How password hashing works using bcryptjs
-- How to use environment variables securely
-- How centralized error handling works
-- How to build user-specific CRUD APIs
-- How ownership checks protect user data
-- How to test APIs using Postman
-- How to build and commit a project step by step using GitHub
+The Chrome extension can be loaded from the `extension` folder using Chrome Developer Mode.
 
 
 ## Development Progress
