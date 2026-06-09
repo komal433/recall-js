@@ -67,7 +67,7 @@ Express Backend
      |  Mongoose
      v
 MongoDB Atlas
-
+```
 
 ## API Documentation
 
